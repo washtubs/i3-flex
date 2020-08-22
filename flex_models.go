@@ -138,6 +138,9 @@ func (f *FlexModels) OnFocus(id i3.NodeID) {
 			break
 		}
 	}
+	if !found {
+		return
+	}
 
 	// Search for another model with this firstModel as a child
 	// and the direction being different

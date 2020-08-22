@@ -21,16 +21,17 @@ func (r *i3FlexRenderer) Render(models []*FlexModel) {
 	// Batch all resize commands
 	sb := strings.Builder{}
 	for _, model := range models {
-		r.render(model, sb)
+		r.render(model, &sb)
 	}
 
-	_, err := i3.RunCommand(sb.String())
-	if err != nil {
-		log.Printf("Error rendering: %s", err.Error())
-	}
+	//log.Printf("i3-msg %s", sb.String())
+	//_, err := i3.RunCommand(sb.String())
+	//if err != nil {
+	//log.Printf("Error rendering: %s", err.Error())
+	//}
 }
 
-func (r *i3FlexRenderer) render(model *FlexModel, cmd strings.Builder) {
+func (r *i3FlexRenderer) render(model *FlexModel, cmd *strings.Builder) {
 	resizeDirection := "height"
 	if model.direction == Horizontal {
 		resizeDirection = "width"
@@ -52,8 +53,27 @@ func (r *i3FlexRenderer) render(model *FlexModel, cmd strings.Builder) {
 	checkScale(scaled, normal)
 	rescale(scaled, normal, 100)
 
+	retryCmds := make([]string, 0)
 	for i, item := range byCurrent {
-		cmd.WriteString(fmt.Sprintf("[con_id=%d] resize set %s %d ppt; ", item.id, resizeDirection, scaled[i]))
+		//cmd.WriteString(fmt.Sprintf("[con_id=%d] resize set %s %d ppt; ", item.id, resizeDirection, *scaled[i]))
+		cmd := fmt.Sprintf("[con_id=%d] resize set %s %d ppt; ", item.id, resizeDirection, *scaled[i])
+		log.Printf("i3-msg %s", cmd)
+		_, err := i3.RunCommand(cmd)
+		if err != nil {
+			retryCmds = append(retryCmds, cmd)
+		}
 	}
-
+	passes := 3
+	for len(retryCmds) > 0 && passes > 0 {
+		passes = passes - 1
+		retryCmdsTmp := make([]string, 0)
+		for _, cmd := range retryCmds {
+			_, err := i3.RunCommand(cmd)
+			if err != nil {
+				retryCmdsTmp = append(retryCmdsTmp, cmd)
+				log.Printf("Error rendering: %s", err.Error())
+			}
+		}
+		retryCmds = retryCmdsTmp
+	}
 }

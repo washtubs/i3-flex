@@ -41,6 +41,9 @@ func rebalance(nums []*Size, mins []Size, delta Size) Size {
 			*surpluses[i] = int(*num - mins[i])
 			totalSurplus = totalSurplus + *surpluses[i]
 		}
+		if totalSurplus == 0 { // can't make a dent
+			return delta
+		}
 		oldScale := totalSurplus
 		newScale := totalSurplus + int(delta)
 		remDelta := Size(0)
@@ -111,6 +114,9 @@ func rescale(nums []*int, oldScale, newScale int) {
 		}
 	}
 	log.Printf("Scaling oldScale=[%d] newScale=[%d]", oldScale, newScale)
+	if oldScale == 0 {
+		panic("oldScale cannot be 0, results in divide by 0")
+	}
 	for _, v := range nums {
 		log.Printf("num=[%d]", *v)
 	}
