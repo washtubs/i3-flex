@@ -1,0 +1,66 @@
+Hard Min Flex Ratio: 501 / 1000
+Soft Min Flex Ratio: 1000 - MAX(flexed)
+
+Unflex Phases
+    Grow without exceeding the max unflexed total, drawing towards soft minimums
+
+This assumes a default unflexed ratio of 1/2, which is the lowest possible value
+
+1: 100,120
+2: 100,120
+3: 100,120
+4: 100,xxx 501,520
+5: 100,120 -> 300,300
+
+Feeding chain
+Unflexing 5
+    First draw from the unflexed surplus, this nets 60 points
+
+1: 100,100
+2: 100,100
+3: 100,100
+4: 100,xxx 501,520
+5: 180,180 -> 300,300
+
+    Then start drawing from the other unflexed minimums, respecting the current flexed value
+    until the highest 3 of 1,2,3,4 is less than or equal to (1000-520)-300 = 180
+    So we take 40 off of each
+
+1: 60,60
+2: 60,60
+3: 60,60
+4: 60,xxx 501,520
+5: 300,300 -> 300,300
+
+    Now we've reached the target. Let's say we want to go further though
+    and we actually want this to be a very large unflexed value of 490
+    It looks like if we continue, our other unflexed values will hit 0,
+    which is something we don't want.
+    So we will need to introduce a new value called an unflexed *hard* minimum
+    Lets say it's 30. Now that we're pushing past soft minimums and towards hard minimums
+
+1: 30,30
+2: 30,30
+3: 30,30
+4: 30,xxx 501,520
+5: 390,390 -> 490,490
+
+    We've now exhausted our unflexed pool.
+    The hard minimum is global and cannot be compromised on
+    And we still have 100 left.
+    Looks like this number will be impossible to reach, but we still have some to draw from the flexed space
+    Previously we were
+
+
+Global defaults
+Default flex ratio : Golden
+Max flex ratio: 900 / 1000
+Soft Min flex ratio: Default
+Hard Min flex ratio: 501 / 1000
+Hard min unflexed: 50 / 1000 # extremely small, not usable just out of the way
+Soft min unflexed: 100 / 1000 # the smallest usable value
+
+Per flex item constraints
+Soft min unflexed
+Soft min flexed ratio
+
